@@ -1,0 +1,125 @@
+.top{
+    box-sizing: border-box;
+    padding: 10px;
+    background: #fff;
+    font-size: 14px;
+    color: #8f8f8f;
+}
+.top .d-head{
+    /*display: flex;*/
+    padding-left: 150px;
+}
+.top .d-head .mach-detail{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 134px;
+    height: 102px;
+    margin-right: 15px;
+    background-position: center;
+    background-size: cover;
+}
+.top .d-head h3{
+    width: 100%;
+    font-size: 16px;
+    color: #262626;
+    height: 20px;
+    line-height: 20px;
+}
+.top .d-head p{
+    width: 100%;
+    min-height: 90px;
+    line-height: 17px;
+}
+.top .d-botton{
+    display: flex;
+    height: 45px;
+    align-items: center;
+    justify-content: space-between; 
+}
+.top .d-botton .mach-time{
+    width: 12px;
+    height: 12px;
+    margin-right: 5px;
+}
+.top .d-botton button{
+    width: 90px;
+    height: 24px;
+    font-size: 14px;
+    background: #e75454;
+    border-radius: 4px;
+    border: 1px solid #e75454;
+    color: #fff;
+    outline: none;
+}
+.content{
+    background: #fff;
+}
+.content h3{
+    height: 30px;
+    line-height: 30px;
+    font-size: 14px;
+    background: #f2f2f2;
+    padding-left: 10px;
+    color: #515151;
+}
+.content h3 img{
+    width: 10px;
+    height: 10px;
+    margin-right: 5px;
+}
+.content .process{
+    padding: 10px 10px 0 10px;
+    box-sizing: border-box;
+    display: flex;
+}
+.content .process:last-child {
+    padding-bottom: 10px;
+}
+.content .process .image{
+    position: relative;
+    width: 35px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.content .process .image img{
+    position: absolute;
+    z-index: 5;
+    height: 35px;
+    width: 35px;
+}
+.content .process .image p{
+    position: absolute;
+    top: -10px;
+    bottom: -10px;
+    left: 50%;
+    width: 1px;
+    background: #dedede;
+}
+.content .process:first-child .image p {
+    top: 0;
+}
+.content .process:last-child .image p {
+    bottom: 0;
+}
+.content .process .text{
+    margin-left: 10px;
+    flex: 1;
+}
+.content .process .text h4{
+    font-size: 16px;
+    color: #262626;
+}
+.content .process .text span{
+    font-size: 14px;
+    color: #989898;
+}
+.content .process .text p{
+    font-size: 14px;
+    color: #808080;
+}
+.content .process .text .process-img{
+    max-width: 100%;
+    margin-top: 5px;
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>报名详情</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/base.css">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/personal/detail.css">
+</head>
+<body>
+    <div class="parent">
+
+    </div>
+
+    <script type="text/javascript" src="../../assets/js/jquery-3.2.1.js"></script>
+    <script type="text/javascript" src="../../assets/js/common.js"></script>
+    <script>
+
+        Request = GetRequest();
+        var activeId = Request.activeId;
+        var wxOpenId = sessionStorage.getItem('wxOpenId');
+
+        if (wxOpenId == undefined) {
+            window.location.href = wxRedirect;
+        }
+
+        var mydata = JSON.stringify({
+            "openId": wxOpenId,
+            "activeId": activeId
+        });
+        common.Ajax("ActiveScoreDetailVoMap", mydata, function (res) {
+            var result = JSON.parse(res);
+            console.log(result);
+            if (result.success == true && result.obj.length > 0) {
+                var html = '';
+                for(var i = 0; i < result.obj.length; i++){
+                    html += '<div  class="math">';
+                    html += '<h3>' + result.obj[i].project + '</h3>';
+                    html += '<p><img src="../../assets/images/detail-1.png" class="img1"><span>比赛成绩：</span><i class="color">' + (result.obj[i].score != null?result.obj[i].score:"<a style='color:#aaa;'>暂无</a>") + '</i></p>';
+                    html += '<p><img src="../../assets/images/detail-2.png" class="img2"><span>获奖情况：</span><i class="color">' + (result.obj[i].userAwards != null?result.obj[i].userAwards:"<a style='color:#aaa;'>暂无</a>") + '</i></p>';
+                    html += '<p><img src="../../assets/images/detail-3.png" class="img3"><span>报名单号：</span><i>' + (result.obj[i].serbnum != null?result.obj[i].serbnum:"<a style='color:#aaa;'>暂无</a>") + '</i></p>';
+                    html += '<p><img src="../../assets/images/detail-4.png" class="img4"><span>报名时间：</span><i>' + (result.obj[i].starttime != null?result.obj[i].starttime.split(".")[0]:"<a style='color:#aaa;'>暂无</a>") + '</i></p>';
+                    html += '<p><img src="../../assets/images/detail-4.png" class="img4"><span>比赛时间：</span><i>' + (result.obj[i].endtime != null?result.obj[i].endtime.split(".")[0]:"<a style='color:#aaa;'>暂无</a>") + '</i></p>';
+                    html += '</div>';
+                }
+                $(".parent").html(html);
+            } else {
+                $(".parent").html('<p style="text-align:center;padding:20px;color:#999;font-size:12px;">暂无报名详情</p>').show();
+            }
+        });
+    </script>
+</body>
+</html>

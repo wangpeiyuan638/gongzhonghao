@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>欢迎来到文体课堂公众号</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="assets/css/base.css">
+</head>
+<body>
+    <div class="loadmark"></div>
+	<div class="bindInform" style="display: none;">
+		<div class="infor">
+			<div>
+				<label>
+					<span>证件类型</span>
+					<select placeholder="请选择证件类型" class="IdType">
+						<option value="1">国内居民身份证</option>
+						<option value="0">境外人员有效证件</option>
+					</select>
+					<img src="assets/images/right.png">
+				</label>
+			</div>
+			<div>
+				<label>
+					<span>证件号码</span>
+                    <input type="text" placeholder="请输入证件号码" class="ID" maxlength="18">
+					<img src="assets/images/right.png">
+				</label>
+			</div>
+			<div>
+				<label>
+					<span>真实姓名</span>
+                    <input type="text"  placeholder="请输入真实姓名" class="name" maxlength="10">
+					<img src="assets/images/right.png">
+				</label>
+			</div>
+			<div>
+				<label>
+					<span>手机号码</span>
+                    <input type="number" placeholder="请输入手机号码" class="phone" oninput="if(value.length>11)value=value.slice(0,11)">
+					<img src="assets/images/right.png">
+				</label>
+			</div>
+			<div>
+				<label>
+					<span>认证码</span>
+                    <input type="number" placeholder="选填" class="token" oninput="if(value.length>6)value=value.slice(0,6)">
+					<img src="assets/images/right.png">
+				</label>
+			</div>
+		</div>
+		<p class="warn">*认证码用于查询体质健康测试及中考体育测试</p>
+		<a><div class="confirm"><button class="button">确认绑定</button></div></a>
+	</div>
+	<script type="text/javascript" src="assets/js/jquery-3.2.1.js"></script>
+	<script type="text/javascript" src="assets/js/common.js"></script>
+	<script type="text/javascript">
+
+		Request = GetRequest();
+		var getCode = Request.code;
+		var getState = Request.state;
+		var openId, nickname, sex, headimgurl, wxOpenId;
+
+		if (getCode == undefined) {
+			window.location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxb9abc697a5dfc946&redirect_uri=http%3A%2F%2Fbarry.pw%2Fweixin%2Findex.html&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect";
+		} else {
+			getUserInfo();
+		}
+
+		//获取openID
+		function getUserInfo() {
+			$.ajax({
+				type: "get",
+				dataType: "json",
+				url: "/weixin/getUserInfo",
+				data: {
+					"code": getCode
+				},
+				success: function (data) {
+					openId = data.openid;
+					nickname = data.nickname;
+					sex = data.sex;
+					headimgurl = data.headimgurl;
+
+                    sessionStorage.setItem("wxOpenId", openId);
+                    sessionStorage.setItem("nickname", nickname);
+                    sessionStorage.setItem("sex", sex);
+                    sessionStorage.setItem("headimgurl", headimgurl);
+
+					if(getState != "1" && getState != "2" && getState != "3"){
+                        chechUser();
+                    } else {
+                        if(getState == "1"){
+                            window.location.href = "/static/page/upcoming/hold.html";
+                        } else if(getState == "2"){
+                            window.location.href = "/static/page/hote/home.html";
+                        } else if(getState == "3"){
+                            window.location.href = "/static/page/prev/prev.html";
+                        }
+                    }
+
+				},
+				error: function (data) {
+
+				}
+			});
+		}
+
+        //检验是否存在
+        function chechUser(){
+            wxOpenId = sessionStorage.getItem('wxOpenId');
+            if(wxOpenId == undefined){
+                getUserInfo();
+            }
+            var mydataOpenId = JSON.stringify({
+                "openId": wxOpenId
+            });
+            common.Ajax("checkUser", mydataOpenId, function (res) {
+                $(".loadmark").remove();
+                var result = JSON.parse(res);
+                console.log(result);
+                if (result.success == true) {
+                    sessionStorage.setItem("name", result.obj.name);
+                    sessionStorage.setItem("phone", result.obj.phone);//personal
+                    sessionStorage.setItem("bindPhone", result.obj.bindPhone);//set
+                    sessionStorage.setItem("token", result.obj.token);
+
+                    skip();
+                } else {
+                    $(".bindInform").show();
+                }
+            });
+        }
+
+        function skip(){
+            switch (getState) {
+                case "1":
+                    window.location.href = "/static/page/upcoming/hold.html";
+                    break;
+                case "2":
+                    window.location.href = "/static/page/hote/home.html";
+                    break;
+                case "3":
+                    window.location.href = "/static/page/prev/prev.html";
+                    break;
+                case "4":
+                    window.location.href = "/static/page/health/health.html";
+                    break;
+                case "5":
+                    window.location.href = "/static/page/exam/exam.html";
+                    break;
+                case "6":
+                    window.location.href = "/static/page/competition/result.html";
+                    break;
+                case "7":
+                    window.location.href = "/static/page/personal/personal.html";
+                    break;
+                default :
+                    window.location.href = "/static/page/personal/personal.html";
+            }
+        }
+
+		var flag = false;
+		var truePinCode = /^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9Xx])$/;
+
+        $('.ID').on('blur', function () {
+            if ($('.IdType').val() == "1") {
+                if (truePinCode.test($(this).val()) === false) {
+                    flag = false;
+                    $tipMark("身份证输入不合法");
+                    return false;
+                } else {
+                    flag = true;
+                }
+            }
+        });
+
+        $('.name').on('blur', function () {
+            if($(this).val() == ""){
+                flag = false;
+                $tipMark('请输入真实姓名');
+            }
+            if ($(this).val().length > 10) {
+                flag = false;
+                $tipMark('请输入十个以内的字符');
+            } else if ($(this).val() && $(this).val().length < 10) {
+                flag = true;
+            }
+        });
+
+		$('.phone').on('blur', function () {
+			if (!(/^1[34578]\d{9}$/.test($(this).val()))) {
+				flag = false;
+				$tipMark("手机号码有误，请重填");
+				return false;
+			} else {
+				flag = true;
+			}
+		});
+
+        $('.token').on('blur', function () {
+            if(isNaN(Number($(this).val()))){
+                flag = false;
+                $tipMark("请输入数字");
+                return false;
+            } else if ($(this).val().length < 6 && $(this).val().length > 0) {
+                flag = false;
+                $tipMark("认证码为6位数字");
+                return false;
+            } else {
+                flag = true;
+            }
+        });
+
+		$('.confirm').on('click', function () {
+			if (flag === true) {
+				var IdType = $('.IdType').val();
+				var ID = $('.ID').val();
+				var name = $('.name').val();
+				var phone = $('.phone').val();
+                wxOpenId = sessionStorage.getItem('wxOpenId');
+				var url = 'bingUserInfo';
+                var tokens = $('.token').val();
+				var mydataBind = JSON.stringify({
+					"IdType": IdType,
+					"ID": ID,
+					"name": name,
+					"phone": phone,
+					"openId": wxOpenId,
+                    "nickname": nickname,
+					"token": tokens
+				});
+				common.Ajax(url, mydataBind, function (res) {
+					var result = JSON.parse(res);
+					console.log(result);
+					if (result.success == true) {
+                        $tipMark("绑定成功");
+
+                        chechUser();
+					} else {
+                        $tipMark(result.msg);
+                    }
+				});
+			} else {
+
+                /*身份证*/
+                if ($('.IdType').val() == "1") {
+                    if (truePinCode.test($(this).val()) === false) {
+                        flag = false;
+                        $tipMark("身份证输入不合法");
+                        return false;
+                    } else {
+                        flag = true;
+                    }
+                }
+
+                /*姓名*/
+                if($(this).val() == ""){
+                    flag = false;
+                    $tipMark('请输入真实姓名');
+                }
+                if ($(this).val().length > 10) {
+                    flag = false;
+                    $tipMark('请输入十个以内的字符');
+                } else if ($(this).val() && $(this).val().length < 10) {
+                    flag = true;
+                }
+
+                /*手机号*/
+                if (!(/^1[34578]\d{9}$/.test($(this).val()))) {
+                    flag = false;
+                    $tipMark("手机号码有误，请重填");
+                    return false;
+                } else {
+                    flag = true;
+                }
+
+                /*认证码*/
+                if(isNaN(Number($(this).val()))){
+                    flag = false;
+                    $tipMark("请输入数字");
+                    return false;
+                } else if ($(this).val().length < 6 && $(this).val().length > 0) {
+                    flag = false;
+                    $tipMark("认证码为6位数字");
+                    return false;
+                } else {
+                    flag = true;
+                }
+
+            }
+		});
+	</script>
+</body>
+</html>

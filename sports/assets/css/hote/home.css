@@ -1,0 +1,62 @@
+.choice{
+    width: 100%;
+    height: 42px;
+    line-height: 42px;
+    background: #fff;
+    margin-bottom: 3px;
+    padding-left: 15px;
+    box-sizing: border-box;
+}
+.choice select{
+    width: 114px;
+    height: 21px;
+    line-height: 21px;
+    border: 1px solid #c3c3c3;
+    font-size: 14px;
+    color: #262626;
+    border-radius: 4px;
+}
+.choice select:nth-child(1){
+    margin-right: 8px;
+}
+
+.center{
+    width: 100%;
+    height: 220px;
+    padding: 10px;
+    box-sizing: border-box;
+    background: #fff;
+    margin-bottom: 3px;
+}
+.center .bg{
+    width: 100%;
+    height: 100%;
+    background: url('../../images/mach.png');
+    background-size: cover;
+    display: flex;
+    align-items: flex-end;
+}
+.center .bg .transparent{
+    width: 100%;
+    height: 60px;
+    background: #000;
+    opacity: 0.4;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 10px;
+    justify-content: space-between;
+}
+.center .bg .transparent span{
+    color: #fff;
+    font-size: 14px;
+}
+.center .bg .transparent button{
+    color: #e75454;
+    font-size: 14px;
+    width: 90px;
+    height: 24px;
+    background: #fff;
+    border: 1px solid #fff;
+    border-radius: 5px;
+}

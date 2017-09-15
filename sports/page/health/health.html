@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>体质健康测试</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/base.css">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/health/health.css">
+</head>
+<body>
+    <div class="health">
+        <ul class="table">
+            <li class="active">当前成绩</li>
+            <li>往期成绩</li>
+        </ul>
+        <div class="current">
+
+        </div>
+        <div class="before">
+
+        </div>
+    </div>
+    <script type="text/javascript" src="../../assets/js/jquery-3.2.1.js"></script>
+    <script type="text/javascript" src="../../assets/js/common.js"></script>
+    <script type="text/javascript">
+        var wxOpenId = sessionStorage.getItem('wxOpenId');
+
+        if (wxOpenId == undefined) {
+            window.location.href = wxRedirect;
+        }
+
+        $(function(){
+            var url = 'selectStudentCurentScore';
+            var mydata = JSON.stringify({
+                "openId": wxOpenId,
+                "state":"current"
+            });
+            common.Ajax(url,mydata,function(res){
+                var msg = JSON.parse(res).obj;
+                if(msg.length > 0 && JSON.parse(res).success == true){
+                    var html = '';
+                    for(var i in msg){
+                        html += '<div class="test"><div class="run wrap"><div><img src="/static/assets/iconimg/'+msg[i].img+'"><strong>'+msg[i].projectName+'</strong></div><span>评级: '+msg[i].third+'</span></div>';
+                        html += '<div class="wrap"><span>成绩:'+msg[i].first+'</span><span>得分:'+msg[i].second+'</span></div>';
+                        html += '<div class="wrap"><span>评语:'+msg[i].five+'</span></div></div>';
+                    }
+                    $('.current').html(html);
+                } else {
+                    $('.current').html('<p style="text-align:center;margin-top:20px;color:#999;font-size:12px;">您暂无当前年份体质测试成绩</p>');
+                }
+            });
+            $('.table li').on('click',function(){
+                $('.table li').removeClass('active');
+                $(this).addClass('active');
+                if($(this).index() == 0){
+                    $('.current').show();
+                    $('.before').hide();
+                }
+                if($(this).index() == 1){
+                    $('.current').hide();
+                    $('.before').show();
+                    var url = 'StudentBodyTestYearsStage';
+                    var mydata = JSON.stringify({
+                        "openId":wxOpenId
+                    });
+                    common.Ajax(url,mydata,function(res){
+                        var msg = JSON.parse(res).obj;
+                        if(msg.length > 0 && JSON.parse(res).success == true){
+                            var html = '';
+                            for(var i in msg){
+                                html += '<a href="grad.html?tableId='+msg[i].tableId+'&years='+msg[i].years+'&stage='+msg[i].stage+'"><div class="div"><img src="../../assets/iconimg/'+msg[i].img+'" class="head"><span class="span">'+msg[i].years+'年第'+msg[i].stage+'期成绩</span><img src="../../assets/images/right.png" class="right"></div></a>'
+                            }
+                            $('.before').html(html);
+                        } else {
+                            $('.before').html('<p style="text-align:center;margin-top:20px;color:#999;font-size:12px;">您暂无往期体质测试成绩</p>');
+                        }
+                    })
+                }
+            })
+        })
+    </script>
+</body>
+</html>

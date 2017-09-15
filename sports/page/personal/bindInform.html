@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>绑定信息</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/base.css">
+</head>
+<body>
+    <div class="bindInform">
+        <div class="infor">
+            <div>
+                <label>
+                    <span>证件类型</span>
+                    <select placeholder="请选择证件类型" class="IdType">
+                        <option value="1">国内居民身份证</option>
+                        <option value="0">境外人员有效证件</option>
+                    </select>
+                    <img src="../../assets/images/right.png">
+                </label>
+            </div>
+            <div>
+                <label>
+                    <span>证件号码</span><input type="text" placeholder="请输入证件号码" class="ID" maxlength="18">
+                    <img src="../../assets/images/right.png">
+                </label>
+            </div>
+            <div>
+                <label>
+                    <span>真实姓名</span><input type="text"  placeholder="请输入真实姓名" class="name" maxlength="10">
+                    <img src="../../assets/images/right.png">
+                </label>
+            </div>
+            <div>
+                <label>
+                    <span>手机号码</span><input type="number" placeholder="请输入手机号码" class="phone" oninput="if(value.length>11)value=value.slice(0,11)">
+                    <img src="../../assets/images/right.png">
+                </label>
+            </div>
+            <div>
+                <label>
+                    <span>认证码</span><input type="text" placeholder="选填">
+                    <img src="../../assets/images/right.png">
+                </label>
+            </div>
+        </div>
+        <p class="warn">*认证码用于查询体质健康测试及中考体育测试</p>
+        <a><div class="confirm"><button class="button">确认绑定</button></div></a>
+    </div>
+    <script type="text/javascript" src="../../assets/js/jquery-3.2.1.js"></script>
+    <script type="text/javascript" src="../../assets/js/common.js"></script>
+    <script type="text/javascript" src="../../assets/js/bindInform.js"></script>
+</body>
+</html>

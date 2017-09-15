@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>个人中心</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/base.css">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/personal/personal.css">
+</head>
+<body>
+    <div class="header">
+        <div class="headImg">
+            <img id="headImg" src="../../assets/images/person.png">
+        </div>
+
+        <p class="name"></p>
+        <p class="phone"></p>
+    </div>
+    <div class="parent">
+        <a href="identCode.html">
+            <div class="div">
+                <img src="../../assets/images/code.png" class="code">
+                <span class="span">认证码</span>
+                <img src="../../assets/images/right.png" class="right">
+            </div>
+        </a>
+        <a href="signUp.html">
+            <div class="div">
+                <img src="../../assets/images/code.png" class="code">
+                <span class="span">我的报名</span>
+                <img src="../../assets/images/right.png" class="right">
+            </div>
+        </a>
+        <a href="set.html">
+            <div class="div">
+                <img src="../../assets/images/set.png" class="code">
+                <span class="span">设置</span>
+                <img src="../../assets/images/right.png" class="right">
+            </div>
+        </a>
+    </div>
+    <script type="text/javascript" src="../../assets/js/jquery-3.2.1.js"></script>
+    <script type="text/javascript" src="../../assets/js/common.js"></script>
+    <script type="text/javascript">
+
+        var wxOpenId = sessionStorage.getItem('wxOpenId');
+
+        if (wxOpenId == undefined) {
+            window.location.href = wxRedirect;
+        }
+
+        $(function(){
+            var name = sessionStorage.getItem('name');
+            var phone = sessionStorage.getItem('phone');
+            var headimgurl = sessionStorage.getItem('headimgurl');
+            $('.name').html(name);
+            $('.phone').html(phone);
+            if(headimgurl){
+                $('#headImg').attr("src",headimgurl);
+            }
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>中考体育测试</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/base.css">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/exam/exam.css">
+</head>
+<body>
+    <div class="exam">
+
+    </div>
+    <script type="text/javascript" src="../../assets/js/jquery-3.2.1.js"></script>
+    <script type="text/javascript" src="../../assets/js/common.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var wxOpenId = sessionStorage.getItem('wxOpenId');
+            var url = 'selectStudentHeightScore';
+
+            if (wxOpenId == undefined) {
+                window.location.href = wxRedirect;
+            } else {
+                var mydata = JSON.stringify({
+                    "openId": wxOpenId
+                });
+                common.Ajax(url, mydata, function (res) {
+                    console.log(JSON.parse(res));
+                    if(JSON.parse(res).success == true){
+                        var msg = JSON.parse(res).obj;
+                        console.log(msg);
+                        var html = '';
+                        var top = '';
+                        top += '<div class="top"><div><ul>';
+                        top += '<li><h3>' + msg.sunScore + '分</h3><h4>总分</h4></li>';
+                        top += '<li><h3>' + msg.conversionScore + '分</h3><h4>换算总分</h4></li>';
+                        top += '</ul></div></div>';
+                        html += '<div class="test"><div class="run wrap"><div><img src="/static/assets/iconimg/mast.png"><strong>必考科目</strong></div><span>' + msg.mastProjectName + '</span></div>';
+                        html += '<div class="wrap"><span>成绩:' + msg.mastProjectScore + '</span></div>';
+                        html += '<div class="wrap"><span>得分:' + msg.mastProjectMarke + '分</span></div></div>';
+                        html += '<div class="test"><div class="run wrap"><div><img src="/static/assets/iconimg/select.png"><strong>选考科目</strong></div><span>' + msg.selectProjectName + '</span></div>';
+                        html += '<div class="wrap"><span>成绩:' + msg.selectProjectScore + '</span></div>';
+                        html += '<div class="wrap"><span>得分:' + msg.selectProjectMarke + '分</span></div></div>';
+                        $('.exam').append(top);
+                        $('.exam').append(html);
+                    } else {
+                        $('.exam').append('<p style="text-align:center;margin-top:20px;color:#999;font-size:12px;">您暂无中考成绩</p>');
+                    }
+                });
+            }
+        })
+    </script>
+</body>
+</html>

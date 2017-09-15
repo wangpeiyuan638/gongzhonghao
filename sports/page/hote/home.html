@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>火热进行</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/base.css">
+</head>
+<body>
+<!-- https://pro.modao.cc/app/OZRT14a8IoM8QE3iXtns5yvaAhzdbZj -->
+    <div class="parent">
+        <div class="choice">
+            <select class="select" id="city" name="city" size="1">
+                <option value="1">深圳市</option>
+            </select>
+            <select class="select" id="country" name="country" size="1">
+                <option value="0">请选择</option>
+                <option value="罗湖区">罗湖区</option>
+                <option value="福田区">福田区</option>
+                <option value="南山区">南山区</option>
+                <option value="宝安区">宝安区</option>
+                <option value="龙岗区">龙岗区</option>
+                <option value="盐田区">盐田区</option>
+            </select>
+        </div>
+        <div id="active">
+
+        </div>
+    </div>
+    <script type="text/javascript" src="../../assets/js/jquery-3.2.1.js"></script>
+    <script type="text/javascript" src="../../assets/js/common.js"></script>
+    <script type="text/javascript" src="../../assets/js/jweixin-1.2.0.js"></script>
+    <script type="text/javascript">
+
+        //获取AccessToken
+        function getAccessToken() {
+            $.ajax({
+                type: "get",
+                dataType: "json",
+                url: "http://barry.pw/weixin/getAccessToken",
+                data: {
+                    "url": window.location.href.split('#')[0]
+                },
+                success: function (data) {
+                    console.log(data);
+
+                    wx.config({
+                        debug: false,
+                        appId: 'wxb9abc697a5dfc946',
+                        timestamp: data.timestamp,
+                        nonceStr: data.noncestr,
+                        signature: data.signature,
+                        jsApiList: [
+                            'getLocation',
+                            'onMenuShareTimeline'
+                        ]
+                    });
+
+                },
+                error: function (data) {
+
+                }
+            });
+        }
+        getAccessToken();
+
+        wx.ready(function(){
+            wx.checkJsApi({
+                jsApiList: ['getLocation'], // 需要检测的JS接口列表，所有JS接口列表见附录2,
+                success: function(res) {
+                    console.log("----------");
+                    console.log(res);
+                    console.log("----------");
+                    // 以键值对的形式返回，可用的api值true，不可用为false
+                    // 如：{"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
+                }
+            });
+
+            wx.getLocation({
+                type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+                success: function (res) {
+                    var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+                    var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+                    var speed = res.speed; // 速度，以米/每秒计
+                    var accuracy = res.accuracy; // 位置精度
+                    getActive(longitude,latitude);
+                },
+                cancel: function () {
+                    $tipMark("获取地理位置权限失败");
+                    getActive();
+                },
+                fail: function () {
+                    $tipMark("获取地理位置失败");
+                    getActive();
+                }
+            });
+
+        });
+
+        var wxOpenId = sessionStorage.getItem('wxOpenId');
+
+        if (wxOpenId == undefined) {
+            window.location.href = wxRedirect;
+        }
+
+        function getActive(setLog,setLat){
+            var url = 'selectActiveByState';
+            var mydata = JSON.stringify({
+                "log": setLog,
+                "lat": setLat,
+                "state": "5",
+                "openId": wxOpenId
+            });
+            common.Ajax(url, mydata, function (res) {
+                console.log(JSON.parse(res));
+
+                var msg = JSON.parse(res).obj;
+                if(JSON.parse(res).success == true){
+                    console.log(msg);
+                    if(msg.city == "" || msg.city == null){
+                        $("#country").val("0");
+                    } else {
+                        $("#country").val(msg.city);
+                    }
+                    var html = '';
+                    if(msg.list.length > 0) {
+                        for (var i in msg.list) {
+                            html += '<div class="center">';
+                            html += '<div class="bg" style="background-image:url(' + serverIp + msg.list[i].activeImg + ')">';
+                            html += '<div class="transparent"></div>';
+                            html += '<div class="floor">';
+                            html += '<span>' + msg.list[i].activetitle + '</span>';
+                            html += '<a href="detail.html?activeId=' + msg.list[i].activeId + '"><button>查看进程</button></a>';
+                            html += '</div>';
+                            html += '</div>';
+                            html += '</div>';
+                        }
+                    } else {
+                        html += '<p style="text-align:center;margin-top:20px;color:#999;font-size:12px;">该区域暂无赛事</p>';
+                    }
+                    $('#active').html(html);
+                }
+
+            });
+        }
+
+        getActive();
+
+        $("#country").change(function(){
+
+            var selectCity;
+            if($("#country").val() != 0){
+                selectCity = $("#country").val();
+            }
+            var mydata = JSON.stringify({
+                "city":selectCity,
+                "state": "5",
+                "openId": wxOpenId
+            });
+            common.Ajax("selectActiveByState", mydata, function (res) {
+                console.log(JSON.parse(res));
+
+                var msg = JSON.parse(res).obj;
+                console.log(msg);
+                var html = '';
+                if(msg.list.length > 0){
+                    for (var i in msg.list) {
+                        html += '<div class="center">';
+                        html += '<div class="bg" style="background-image:url(' + serverIp + msg.list[i].activeImg + ')">';
+                        html += '<div class="transparent"></div>';
+                        html += '<div class="floor">';
+                        html += '<span>' + msg.list[i].activetitle + '</span>';
+                        html += '<a href="detail.html?activeId=' + msg.list[i].activeId + '"><button>查看进程</button></a>';
+                        html += '</div>';
+                        html += '</div>';
+                        html += '</div>';
+                    }
+                } else {
+                    html += '<p style="text-align:center;margin-top:20px;color:#999;font-size:12px;">该区域暂无赛事</p>';
+                }
+
+                $('#active').html(html);
+            });
+        });
+    </script>
+</body>
+</html>

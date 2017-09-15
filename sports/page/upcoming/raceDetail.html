@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>比赛详情</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/base.css">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/upcoming/race-detail.css">
+</head>
+<body>
+    <div class="race-detail parent" style="padding-top: 0;">
+        <div class="img" id="activeImg"></div>
+        <p id="activedetail"></p>
+        <div class="sign"><input type="checkbox" id="read" checked="checked"><span class="tip">&nbsp;&nbsp;我已阅读并同意风险揭示公告</span></div>
+        <a id="submit"><div class="confirm"><button>立即报名</button></div></a>
+    </div>
+    <div id="pop"></div>
+    <div class="pop">
+        <dl>
+            <dt>风险揭示公告<img src="../../assets/images/close.png" class="close" /></dt>
+            <dd id="activeport"></dd>
+        </dl>
+    </div>
+    
+</body>
+<script type="text/javascript" src="../../assets/js/jquery-3.2.1.js"></script>
+<script type="text/javascript" src="../../assets/js/common.js"></script>
+<script type="text/javascript">
+
+    var wxOpenId = sessionStorage.getItem('wxOpenId');
+
+    if (wxOpenId == undefined) {
+        window.location.href = wxRedirect;
+    }
+
+    Request = GetRequest();
+    var activeId = Request.activeId;
+    var isjoin = Request.isjoin;
+
+    /*$("#read").click(function(){
+        read();
+    });
+
+    function read(){
+        if($("#read").is(":checked")){
+            $("#submit").attr("href","entry.html?activeId=" + activeId);
+        } else {
+            $("#submit").attr("href","");
+        }
+    }
+    read();*/
+
+    if(isjoin == "N"){
+        $("#submit button").html("立即报名");
+    } else {
+        $("#submit button").html("已报名");
+    }
+
+    $("#submit").click(function(){
+        if(isjoin == "N"){
+            if(!$("#read").is(":checked")){
+                $tipMark("请勾选风险揭示公告");
+                return false;
+            }
+
+            var mydataOpenId = JSON.stringify({
+                "openId": wxOpenId
+            });
+            common.Ajax("checkUser", mydataOpenId, function (res) {
+                $(".loadmark").remove();
+                var result = JSON.parse(res);
+                console.log(result);
+                if (result.success == true) {
+                    sessionStorage.setItem("name", result.obj.name);
+                    sessionStorage.setItem("phone", result.obj.phone);//personal
+                    sessionStorage.setItem("bindPhone", result.obj.bindPhone);//set
+                    sessionStorage.setItem("token", result.obj.token);
+                    window.location.href = "entry.html?activeId=" + activeId;
+                } else {
+                    window.location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxb9abc697a5dfc946&redirect_uri=http%3A%2F%2Fbarry.pw%2Fstatic%2Fpage%2Fupcoming%2Fbind.html&response_type=code&scope=snsapi_userinfo&state="+activeId+"#wechat_redirect";
+                }
+            });
+        } else {
+            $tipMark("您已报名该比赛");
+        }
+    });
+
+    $('.close').on('click',function(){
+        $('#pop').hide();
+        $('.pop').hide();
+    });
+    $('.tip').on('click',function(){
+        $('#pop').show();
+        $('.pop').show();
+    });
+
+    /*比赛详情*/
+    var url = 'selectStartActiveDetail';
+    var mydata = JSON.stringify({
+        "activeId": activeId,
+        "state": "3, 4",
+        "openId": wxOpenId
+    });
+    common.Ajax(url, mydata, function (res) {
+        console.log(JSON.parse(res));
+        if(JSON.parse(res).success == true && JSON.parse(res).obj.length > 0){
+            var msg = JSON.parse(res).obj;
+            console.log(msg);
+            var html = '';
+            $("#activeImg").attr("style","background-image:url('" + serverIp + msg[0].activeImg + "')");
+            $("#activedetail").html(msg[0].activedetail);
+            $('#activeport').html(msg[0].activeport);
+        }
+    });
+
+</script>
+</html>

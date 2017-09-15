@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>认证码</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/base.css">
+    <!-- <link rel="stylesheet" type="text/css" href="../../assets/css/personal/identCode.css"> -->
+</head>
+<body>
+    <div class="parent">
+        <div class="com_div" id="tokenObj">
+            <input style="width:100%;" class="token" type="text" placeholder="请输入认证码" onblur="checkToken()" oninput="if(value.length>6)value=value.slice(0,6)">
+        </div>
+        <a id="btn" style="display:none;"><div class="confirm"><button>确认</button></div></a>
+    </div>
+    <script type="text/javascript" src="../../assets/js/jquery-3.2.1.js"></script>
+    <script type="text/javascript" src="../../assets/js/common.js"></script>
+    <script>
+        var wxOpenId = sessionStorage.getItem('wxOpenId');
+        var token;
+        var tokenObj = document.getElementById("tokenObj");
+        var btn = document.getElementById("btn");
+        var flag = false;
+
+        if (wxOpenId == undefined) {
+            window.location.href = wxRedirect;
+        }
+
+        function chechUser(){
+            var mydataOpenId = JSON.stringify({
+                "openId": wxOpenId
+            });
+            common.Ajax("checkUser", mydataOpenId, function (res) {
+                $(".loadmark").remove();
+                var result = JSON.parse(res);
+                console.log(result);
+                if (result.success == true) {
+                    token = result.obj.token;
+                    if(token != undefined && token != "null" && token != "") {
+                        tokenObj.innerHTML = token;
+                        btn.style.display="none";
+                    } else {
+                        tokenObj.innerHTML = '<input style="width:100%;" class="token" onblur="checkToken()" type="text" placeholder="请输入认证码" oninput="if(value.length>6)value=value.slice(0,6)">';
+                        btn.style.display="";
+                    }
+                }
+            });
+        }
+        chechUser();
+
+        function checkToken(){
+            if(isNaN(Number($('.token').val()))){
+                flag = false;
+                $tipMark("请输入数字");
+                return false;
+            }
+            if ($('.token').val().length < 6) {
+                flag = false;
+                $tipMark("认证码为6位数字");
+                return false;
+            } else {
+                flag = true;
+            }
+        }
+
+        $("#btn").click(function(){
+            if (flag === true){
+                var tokens = $('.token').val();
+                var mydataBind = JSON.stringify({
+                    "openId": wxOpenId,
+                    "token": tokens
+                });
+                common.Ajax("bindToken", mydataBind, function (res) {
+                    var result = JSON.parse(res);
+                    console.log(result);
+                    if (result.success == true) {
+                        window.location.href = "rzSuccsess.html";
+                    } else {
+                        $tipMark(result.msg);
+                    }
+                });
+            } else if (isNaN(Number($('.token').val()))) {
+                $tipMark("请输入数字");
+                return false;
+            } else if ($('.token').val().length < 6) {
+                $tipMark("认证码为6位数字");
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>

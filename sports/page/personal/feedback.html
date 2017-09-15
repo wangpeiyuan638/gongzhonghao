@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>意见反馈</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/base.css">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/personal/feedback.css">
+</head>
+<body>
+    <div class="parent">
+        <div class="suggest"><textarea style="width: 100%;" placeholder="您的问题及建议..." id="content" maxlength='300'></textarea><i>0/300</i></div>
+        
+        <div class="com_div">
+            <span>联系方式</span>
+            <input type="text" placeholder="请输入手机号">
+        </div>
+        <a><div class="confirm"><button id="submit">提交</button></div></a>
+    </div>
+    <script type="text/javascript" src="../../assets/js/jquery-3.2.1.js"></script>
+    <script type="text/javascript" src="../../assets/js/common.js"></script>
+    <script type="text/javascript">
+
+        var wxOpenId = sessionStorage.getItem('wxOpenId');
+
+        if (wxOpenId == undefined) {
+            window.location.href = wxRedirect;
+        }
+
+        $(function () {
+            $('textarea').on('input', function () {
+                var text = $('#content').val();
+                var length = text.length || 0;
+                if (length > 300) {
+                    length = 300;
+                    text = text.substring(0, 10);
+                    console.log(text);
+                }
+                $('i').text(length + '/300');
+            });
+
+            $("#submit").click(function(){
+                if($('#content').val().length <= 0){
+                    $tipMark("请填写您的建议");
+                    return false;
+                }
+                var mydata = JSON.stringify({
+                    "openId": wxOpenId,
+                    "Opinion":$('#content').val()
+                });
+                common.Ajax("addFeeBack", mydata, function (data) {
+                    console.log(JSON.parse(data));
+                    if(JSON.parse(data).success == true){
+                        $tipMark("添加意见成功");
+                        var time = setTimeout(function () {
+                            window.location.href = "personal.html";
+                        }, 800);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+.exam .top{
+    width: 100%;
+    background: url('../../images/exam.png');
+    background-size: cover;
+    color: #fff;
+    display: flex;
+    align-items: flex-end;
+}
+.exam .top div{
+    height: 110px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+.exam .top ul{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+.exam .top ul li{
+    flex: 1;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.exam .top ul li h3{
+    padding-bottom: 10px;
+    font-size: 18px;
+}
+.exam .top ul li h4{
+    font-size: 14px;
+}
+.exam .top ul li:nth-child(1){
+    border-right: 1px solid #fff;
+}

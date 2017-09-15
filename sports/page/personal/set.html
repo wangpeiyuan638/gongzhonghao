@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>设置</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/base.css">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/personal/set.css">
+</head>
+<body>
+    <div class="parent">
+        <a href="setphone.html"><div class="div"><span class="span">联系方式</span><img src="../../assets/images/right.png" class="right"></div></a>
+        <a href="feedback.html"><div class="div"><span class="span">意见反馈</span><img src="../../assets/images/right.png" class="right"></div></a>
+    </div>
+    <div class="confirm back" id="logout"><button>退出登陆</button></div>
+    <script type="text/javascript" src="../../assets/js/jquery-3.2.1.js"></script>
+    <script type="text/javascript" src="../../assets/js/common.js"></script>
+    <script>
+        var wxOpenId = sessionStorage.getItem('wxOpenId');
+
+        if (wxOpenId == undefined) {
+            window.location.href = wxRedirect;
+        }
+
+        $("#logout").click(function(){
+            var r = confirm("您确定要退出登录吗");
+            if (r == true) {
+                var mydata = JSON.stringify({
+                    "openId": wxOpenId
+                });
+                common.Ajax("Relieve", mydata, function (res) {
+                    var result = JSON.parse(res);
+                    console.log(result);
+                    if (result.success == true) {
+                        $tipMark("退出成功");
+                        var time = setTimeout(function () {
+                            window.location.href = wxRedirect;
+                        }, 800);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

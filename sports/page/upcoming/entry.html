@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>填写报名表</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/base.css">
+    <style>
+        .bindInform .infor div span {
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="loadmark"></div>
+    <div class="bindInform">
+        <div class="infor">
+            <div>
+                <label>
+                    <span>姓名</span>
+                    <input style="color:#aaa;" id="userName" type="text" value="" placeholder="请输入您的姓名" readonly="readonly">
+                </label>
+            </div>
+            <div>
+                <label>
+                    <span>性别</span>
+                    <select id="userSex">
+                        <option value="0">请选择性别</option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                    <img src="../../assets/images/right.png">
+                </label>
+            </div>
+            <div>
+                <label>
+                    <span>电话号码</span>
+                    <input id="userPhone" type="text" placeholder="请输入您的电话号码" oninput="if(value.length>11)value=value.slice(0,11)">
+                </label>
+            </div>
+            <div>
+                <label>
+                    <span>证件类型</span>
+                    <select id="userIdType" style="color:#aaa;">
+                        <option value="1">国内居民身份证</option>
+                        <option value="0">境外人员有效证件</option>
+                    </select>
+                    <img src="../../assets/images/right.png" class="">
+                </label>
+            </div>
+            <div>
+                <label>
+                    <span>证件号码</span>
+                    <input style="color:#aaa;" id="userId" type="text" placeholder="请输入您的证件号码" oninput="if(value.length>18)value=value.slice(0,18)" readonly="readonly">
+                </label>
+            </div>
+            <div>
+                <label>
+                    <span>所在团体</span>
+                    <select id="userTeam" onchange="selectTeam()">
+                        <option value="0">请选择所在团体</option>
+                        <option value="个人">个人</option>
+                        <option value="团体">团体</option>
+                        <option value="其他">其他</option>
+                    </select>
+                    <img src="../../assets/images/right.png">
+                </label>
+            </div>
+
+            <div id="userTeamLow" style="display: none;">
+                <label>
+                    <span>团体名称</span>
+                    <input id="userTeamInput" type="text" placeholder="请输入您的团体名称">
+                    <img src="../../assets/images/right.png">
+                </label>
+            </div>
+
+            <div>
+                <label>
+                    <span>报名组别</span>
+                    <select id="userGroup" onchange="getItem()">
+                        <option value="0">请选择报名组别</option>
+                    </select>
+                    <img src="../../assets/images/right.png">
+                </label>
+            </div>
+            <div>
+                <label>
+                    <span>报名项目</span>
+                    <a onclick="selectItem()" class="select" id="selectedItemName">请选择项目</a>
+                    <img src="../../assets/images/right.png">
+                </label>
+            </div>
+        </div>
+        <a id="submit"><div class="confirm margin"><button>确认报名</button></div></a>
+
+        <div class="select-item" id="Item" style="display:none;">
+            <p class="close"><a onclick="colseItem()">关闭</a></p>
+            <ul class="list">
+                <li style="color:#aaa;">加载中...</li>
+            </ul>
+            <div class="confirm margin" onclick="sub()"><button>确定</button></div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="../../assets/js/jquery-3.2.1.js"></script>
+    <script type="text/javascript" src="../../assets/js/common.js"></script>
+    <script type="text/javascript">
+
+        Request = GetRequest();
+        var activeId = Request.activeId;//活动ID
+        var wxOpenId = sessionStorage.getItem('wxOpenId');
+
+        if (wxOpenId == undefined) {
+            window.location.href = wxRedirect;
+        }
+
+        function getUserMsg(){
+            var mydata = JSON.stringify({
+                "openId": wxOpenId
+            });
+            common.Ajax("checkUser", mydata, function (res) {
+                console.log(JSON.parse(res));
+                if(JSON.parse(res).success == true){
+                    $("#userName").val(JSON.parse(res).obj.name);
+                    $("#userSex").val(JSON.parse(res).obj.sex || "0");
+                    $("#userPhone").val(JSON.parse(res).obj.phone);
+                    $("#userIdType").val(JSON.parse(res).obj.idType);
+                    if(JSON.parse(res).obj.idType == 1){
+                        $("#userIdType option[value=0]").attr("disabled","disabled");
+                    } else {
+                        $("#userIdType option[value=1]").attr("disabled","disabled");
+                    }
+                    $("#userId").val(JSON.parse(res).obj.id);
+                }
+                $(".loadmark").remove();
+            });
+        }
+        getUserMsg();
+
+        var selectedTeam = "0";//选中所在团队
+        var userTeam;//选中所在团队传参
+        var groupId;//选中组别，传参
+        var joinItem = "";//参加的项目ID
+        var joinItemName = "";//参加的项目名称，用来显示
+        function selectTeam(){
+            selectedTeam = $("#userTeam").val();//选中所在团队
+            userTeam = $("#userTeam").val();//选中所在团队传参
+            if(selectedTeam == "其他"){
+                $("#userTeamLow").show();
+            } else {
+                $("#userTeamInput").val("");
+                $("#userTeamLow").hide();
+            }
+        }
+
+        function getGroup(){
+            var mydataInfo = JSON.stringify({
+                "openId": wxOpenId,
+                "activeId": activeId
+            });
+            common.Ajax("selectGroups", mydataInfo, function (res) {
+                console.log(JSON.parse(res));
+                if(JSON.parse(res).success == true){
+                    var html = '<option value="0">请选择报名组别</option>';
+                    for(var i = 0; i < JSON.parse(res).obj.length; i++){
+                        html += '<option value="' + JSON.parse(res).obj[i].groupId + '">' + JSON.parse(res).obj[i].groupname + '</option>';
+                    }
+                    $("#userGroup").html(html);
+                }
+                $(".loadmark").remove();
+            });
+        }
+        getGroup();
+
+        function getItem(){
+            $("body").append('<div class="loadmark"></div>');
+            $("#Item .list").html("");
+            joinItem = "";
+            joinItemName = "请选择项目";
+            $("#selectedItemName").html(joinItemName);
+            groupId = $("#userGroup").val();
+            if(groupId != "0"){
+                var mydataInfo = JSON.stringify({
+                    "openId": wxOpenId,
+                    "activeId": activeId,
+                    "groupId": groupId
+                });
+                common.Ajax("selectProject", mydataInfo, function (res) {
+                    console.log(JSON.parse(res));
+                    if(JSON.parse(res).success == true){
+                        var html = '';
+                        for(var i = 0; i < JSON.parse(res).obj.length; i++){
+                            html += '<li data-value="' + JSON.parse(res).obj[i].activeprojectId + '" onclick="selectThisItem(this)"><span class="projectName">' + JSON.parse(res).obj[i].activeProjectName + '</span><span class="icon"></span></li>';
+                        }
+                        $("#Item .list").html(html);
+                    }
+                    $(".loadmark").remove();
+                });
+            }
+        }
+
+        function selectItem(){
+            if($("#userGroup").val() != "0"){
+                $("#Item").show();
+            } else {
+                $tipMark("请选择组别");
+            }
+        }
+        function colseItem(){
+            $("#Item").hide();
+        }
+
+        function selectThisItem(that){
+            if(!$(that).hasClass("active")){
+                $(that).addClass("active");
+            } else {
+                $(that).removeClass("active");
+            }
+        }
+
+        function sub(){
+            if($("#Item li.active").length > 0){
+                joinItemName = "";
+                joinItem = "";
+                $("#Item li.active").each(function(){
+                    joinItem += $(this).attr("data-value") + ",";
+                    joinItemName += $(this).children(".projectName").html() + ",";
+                });
+                joinItem = (joinItem.slice(joinItem.length - 1) == ',') ? joinItem.slice(0, -1) : joinItem;
+                joinItemName = (joinItemName.slice(joinItemName.length - 1) == ',') ? joinItemName.slice(0, -1) : joinItemName;
+            } else {
+                joinItem = "";
+                joinItemName = "请选择项目";
+            }
+            console.log(joinItem);
+            console.log(joinItemName);
+            $("#selectedItemName").html(joinItemName);
+            $("#Item").hide();
+        }
+
+        var truePhone = /(1[3-9]\d{9}$)/;
+        var truePinCode = /^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9Xx])$/;
+
+        $("#submit").click(function(){
+            var userName = $("#userName").val();//用户名
+            var userSex = $("#userSex").val();//用户性别
+            var userPhone = $("#userPhone").val();//用户手机
+            var userIdType = $("#userIdType").val();//用户证件类型
+            var userId = $("#userId").val();//用户证件号码
+            var userGroup = $("#userGroup").val();//用户组别
+
+            /*if (userName == "") {
+                $tipMark("请填写姓名");
+                return false;
+            }*/
+
+            if (userSex == 0) {
+                $tipMark("请选择性别");
+                return false;
+            }
+
+            if (userPhone == "") {
+                $tipMark("请填写手机号");
+                return false;
+            }
+            if (!truePhone.test(userPhone)) {
+                $tipMark("手机号格式不正确");
+                return false;
+            }
+
+            /*if (userIdType == 1) {
+                if (userId == "") {
+                    $tipMark("请填写身份证");
+                    return false;
+                }
+                if (!truePinCode.test(userId)) {
+                    $tipMark("身份证号格式不正确");
+                    return false;
+                }
+            }*/
+
+            if(selectedTeam == "0"){
+                $tipMark("请选择所在团体");
+                return false;
+            }
+            if(selectedTeam == "其他" && $("#userTeamInput").val() == "") {
+                $tipMark("请输入所在团体");
+                return false;
+            }
+            if(selectedTeam == "其他" && $("#userTeamInput").val() == "团体" || $("#userTeamInput").val() == "个人") {
+                $tipMark("输入团体名不能为团体和个人");
+                return false;
+            }
+            if(userGroup == 0){
+                $tipMark("请选择所在组别");
+                return false;
+            }
+            if(joinItem == ""){
+                $tipMark("请选择报名项目");
+                return false;
+            }
+            if(selectedTeam == "其他"){
+                userTeam = $("#userTeamInput").val();//如果是其他，则传参为输入值
+            }
+            var mydataJoin = JSON.stringify({
+                "openId": wxOpenId,
+                "activeId": activeId,
+                "sex": userSex,
+                "phone":userPhone,
+                "teamId":userTeam,
+                "groupId": groupId,
+                "activeprojectId":joinItem
+            });
+
+            $("body").append('<div class="loadmark"></div>');
+
+            common.Ajax("joinActiveAddProject", mydataJoin, function (res) {
+                console.log(JSON.parse(res));
+                if(JSON.parse(res).success == true){
+                    window.location.href = "bmSuccess.html";
+                } else {
+                    $tipMark(JSON.parse(res).msg);
+                }
+                $(".loadmark").remove();
+            });
+        });
+    </script>
+</body>
+</html>

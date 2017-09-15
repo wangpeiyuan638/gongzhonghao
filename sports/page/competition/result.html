@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>历史竞赛成绩</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/base.css">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/competition/competition.css">
+</head>
+<body>
+    <div id="result">
+
+    </div>
+
+    <script type="text/javascript" src="../../assets/js/jquery-3.2.1.js"></script>
+    <script type="text/javascript" src="../../assets/js/common.js"></script>
+    <script>
+
+        var wxOpenId = sessionStorage.getItem('wxOpenId');
+
+        if (wxOpenId == undefined) {
+            window.location.href = wxRedirect;
+        }
+
+        var mydata = JSON.stringify({
+            "openId": wxOpenId
+        });
+        common.Ajax("selActiveInfo", mydata, function (res) {
+            var result = JSON.parse(res);
+            console.log(result);
+            var html = '';
+            if (result.success == true && result.obj.length > 0) {
+                for(var i = 0; i < result.obj.length; i++){
+                    html += '<div class="result">';
+                    html += '<h3>' + result.obj[i].activename + '<span style="float:right">' + result.obj[i].project + '</span></h3>';
+                    html += '<div>';
+                    html += '<p><img src="../../assets/images/detail-1.png"> 成绩: ' + result.obj[i].score + '</p>';
+                    html += '<p><img src="../../assets/images/detail-2.png"> 获奖情况: ' + result.obj[i].userAwards + '</p>';
+                    html += '</div>';
+                    html += '</div>';
+                }
+            } else {
+                html += '<p style="text-align:center;margin-top:20px;color:#999;font-size:12px;">暂无历史竞赛成绩</p>';
+            }
+            $("#result").html(html);
+        });
+    </script>
+</body>
+</html>

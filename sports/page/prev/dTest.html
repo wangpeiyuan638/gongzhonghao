@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>比赛详情</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/base.css">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/prev/d-test.css">
+</head>
+<body>
+    <div class="parent">
+        <div class="top">
+            <div class="d-head">
+                <div id="activeImg" class="mach-detail"></div>
+                <div>
+                    <h3 id="activeTitle"></h3>
+                    <p id="activedetail"></p>
+                </div>
+            </div>
+            <div class="d-botton">
+                <p><img src="../../assets/images/mach-time.png" class="mach-time"><span id="activeDate"></span></p>
+                <a id="watchBtn"><button>观看比赛回放</button></a>
+            </div>
+        </div>
+        <div class="content">
+            <h3><img src="../../assets/images/race.png"> 成绩公告</h3>
+            <div class="center">
+                <p id="noticeText"></p>
+                <div id="noticeImg" class="img"></div>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../assets/js/jquery-3.2.1.js"></script>
+<script type="text/javascript" src="../../assets/js/common.js"></script>
+<script type="text/javascript">
+
+    Request = GetRequest();
+    var activeId = Request.activeId;
+    var wxOpenId = sessionStorage.getItem('wxOpenId');
+
+    if (wxOpenId == undefined) {
+        window.location.href = wxRedirect;
+    }
+
+    var mydata2 = JSON.stringify({
+        "activeId": activeId,
+        "state": "6",
+        "mtype":"1",
+        "openId": wxOpenId});
+    common.Ajax('selectGooingActiveDetail', mydata2, function (res) {
+        console.log(JSON.parse(res));
+        var msg = JSON.parse(res).obj;
+        if(JSON.parse(res).success == true){
+            $("#activeImg").attr("style","background-image:url('" + serverIp + msg.activeImg + "')");
+            $('#activeTitle').html(msg.activetitle);
+            $("#activedetail").html(msg.activedetail);
+            $('#activeDate').html(msg.activedate);
+            if(msg.activeURL){
+                $("#watchBtn").attr("href",msg.activeURL);
+                $("#watchBtn button").css({"background-color":"#e75454","border-color":"#e75454"});
+            } else {
+                $("#watchBtn").attr("href","javascript:void(0);");
+                $("#watchBtn button").css({"background-color":"#aaa","border-color":"#aaa"});
+            }
+
+            if(msg.list.length > 0){
+                $('#process').show();
+                $("#noticeText").html(msg.list[0].text);
+                if(msg.list[0].img){
+                    $("#noticeImg").html('<img class="process-img" src="' + msg.list[0].img + '">');
+                }
+            } else {
+                $('#process').html('<p style="text-align:center;padding:20px;color:#999;font-size:12px;">暂无成绩公告</p>').show();
+            }
+        }
+
+    });
+
+</script>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <title>历史报名列表</title>
+    <link rel="stylesheet" type="text/css" href="../../assets/css/base.css">
+</head>
+<body>
+    <div class="parent">
+
+    </div>
+    <script type="text/javascript" src="../../assets/js/jquery-3.2.1.js"></script>
+    <script type="text/javascript" src="../../assets/js/common.js"></script>
+    <script>
+
+        var wxOpenId = sessionStorage.getItem('wxOpenId');
+
+        if (wxOpenId == undefined) {
+            window.location.href = wxRedirect;
+        }
+
+        var mydata = JSON.stringify({
+            "openId": wxOpenId
+        });
+        common.Ajax("selectHistoryActiveVo", mydata, function (res) {
+            var result = JSON.parse(res);
+            console.log(result);
+            if (result.success == true && result.obj.length > 0) {
+                var html = '';
+                for(var i = 0; i < result.obj.length; i++){
+                    html += '<a href="detail.html?activeId=' + result.obj[i].activeId + '">';
+                    html += '<div class="div">';
+                    switch (parseInt(i%4)){
+                        case 0:
+                            html += '<img src="../../assets/images/one.png" class="head">';
+                            break;
+                        case 1:
+                            html += '<img src="../../assets/images/two.png" class="head">';
+                            break;
+                        case 2:
+                            html += '<img src="../../assets/images/three.png" class="head">';
+                            break;
+                        case 3:
+                            html += '<img src="../../assets/images/four.png" class="head">';
+                            break;
+                    }
+
+                    html += '<span class="span">' + result.obj[i].activeProjectName + '</span><img src="../../assets/images/right.png" class="right">';
+                    html += '</div>';
+                    html += '</a>';
+                }
+                $(".parent").html(html);
+            } else {
+                $('.parent').html('<p style="text-align:center;margin-top:20px;color:#999;font-size:12px;">您暂无报名信息</p>');
+            }
+        });
+    </script>
+</body>
+</html>

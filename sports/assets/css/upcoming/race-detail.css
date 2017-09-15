@@ -1,0 +1,64 @@
+.race-detail .img{
+    height: 140px;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+}
+.race-detail p{
+    padding: 10px 15px;
+    background: #fff;
+    line-height: 21px;
+    font-size: 14px;
+    color: #262626;
+}
+.race-detail .sign{
+    height: 29px;
+    line-height: 29px;
+    font-size: 14px;
+    color: #9e9e9e;
+    padding-left: 11px;
+    margin-bottom: 30px;
+}
+#pop{
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    top: 0;
+    background: #000;
+    opacity: 0.2;
+    display: none;
+}
+.pop{
+    position: absolute;
+    top: 98px;
+    left: 50%;
+    margin-left: -138px;
+    width: 275px;
+    height: 289px;
+    background: #fff;
+    border-radius: 12px;
+    display: none;
+}
+.pop dt{
+    height: 48px;
+    line-height: 48px;
+    text-align: center;
+    background: #f86f6e;
+    border-radius: 12px 12px 0 0;
+    color: #fff;
+    font-size: 16px;
+}
+.pop dt .close{
+    width: 12px;
+    height: 12px;
+    float: right;
+    margin-top: 16px;
+    margin-right: 16px;
+}
+.pop dd{
+    font-size: 14px;
+    color: #999;
+    line-height: 20px;
+    padding: 10px;
+    box-sizing: border-box;
+}

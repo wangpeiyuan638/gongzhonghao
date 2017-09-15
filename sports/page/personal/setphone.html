@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>电话号码设置</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../assets/css/base.css">
+</head>
+<body>
+    <div class="parent">
+        <div class="com_div">
+            <input type="number" placeholder="请输入手机号" style="width:100%" class="phone" oninput="if(value.length>11)value=value.slice(0,11)">
+            <img src="../../assets/images/delete.png" class="delete">
+        </div>
+        <a id="btn"><div class="confirm"><button>保存</button></div></a>
+    </div>
+</body>
+<script type="text/javascript" src="../../assets/js/jquery-3.2.1.js"></script>
+<script type="text/javascript" src="../../assets/js/common.js"></script>
+<script type="text/javascript">
+    var wxOpenId = sessionStorage.getItem('wxOpenId');
+    var flag = false;
+
+    if (wxOpenId == undefined) {
+        window.location.href = wxRedirect;
+    }
+
+    function chechUser(){
+        var mydataOpenId = JSON.stringify({
+            "openId": wxOpenId
+        });
+        common.Ajax("checkUser", mydataOpenId, function (res) {
+            $(".loadmark").remove();
+            var result = JSON.parse(res);
+            console.log(result);
+            if (result.success == true) {
+                bindPhone = result.obj.bindPhone;
+                $(".phone").val(bindPhone);
+            }
+        });
+    }
+    chechUser();
+
+    $('.phone').on('blur', function () {
+        if (!(/^1[34578]\d{9}$/.test($(this).val()))) {
+            flag = false;
+            $tipMark("手机号码有误，请重填");
+            return false;
+        } else {
+            flag = true;
+        }
+    });
+
+    $("#btn").click(function(){
+        if (flag === true){
+            var phone = $('.phone').val();
+            var mydataBind = JSON.stringify({
+                "openId": wxOpenId,
+                "userinfophone": phone
+            });
+            common.Ajax("bindPhone", mydataBind, function (res) {
+                var result = JSON.parse(res);
+                console.log(result);
+                if (result.success == true) {
+                    $tipMark("添加成功");
+                    sessionStorage.setItem("bindPhone", $(".phone").val());
+                    var time = setTimeout(function(){
+                        window.location.href = "personal.html";
+                    },800);
+                } else {
+                    $tipMark(result.msg);
+                }
+            });
+        }
+    });
+
+    $('.delete').on('click',function(){
+        $('.phone').val('');
+    });
+</script>
+</html>
